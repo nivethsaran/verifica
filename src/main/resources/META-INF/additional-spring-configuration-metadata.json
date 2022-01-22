@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "verifica.gravatar.url",
+      "type": "java.lang.String",
+      "description": "Description for verifica.gravatar.url."
+    },
+    {
+      "name": "verifica.deta.secret-key",
+      "type": "java.lang.String",
+      "description": "Description for verifica.deta.secret-key."
+    },
+    {
+      "name": "verifica.deta.url",
+      "type": "java.lang.String",
+      "description": "Description for verifica.deta.url."
+    }
+  ] }
