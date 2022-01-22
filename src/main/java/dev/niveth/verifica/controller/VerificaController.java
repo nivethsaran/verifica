@@ -1,35 +1,129 @@
 package dev.niveth.verifica.controller;
 
+import com.hazelcast.org.json.HTTP;
+import dev.niveth.verifica.model.BulkRequest;
+import dev.niveth.verifica.model.Response;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import dev.niveth.verifica.service.ValidationService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Api(tags = {"Verifica"})
 @RestController
 @RequestMapping("/v1")
 public class VerificaController {
-	
-	public static final Logger LOGGER = LoggerFactory.getLogger(VerificaController.class);
 
-	@GetMapping("/verify")
-	public ResponseEntity<String> validateEmail1()
-	{
-		return new ResponseEntity<String>("Something1",HttpStatus.OK);
-	}
-	
-	@GetMapping("/bulk-verify")
-	public ResponseEntity<String> validateEmail2()
-	{
-		return new ResponseEntity<String>("Something2",HttpStatus.OK);
-	}
-	
-	@GetMapping("/domain-verify")
-	public ResponseEntity<String> validateEmail3()
-	{
-		return new ResponseEntity<String>("Something3",HttpStatus.OK);
-	}
-	
+    @Autowired
+    private ValidationService validationService;
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(VerificaController.class);
+
+    @ApiOperation(value = "Validate email address")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success", response = Response.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    @GetMapping(value = "/verify", params = "email")
+    public ResponseEntity<Response> verifyEmail(@RequestParam String email) {
+        try {
+            return new ResponseEntity<>(validationService.verifyAndPopulateResponse(email), HttpStatus.OK);
+        } catch (Exception e) {
+            return populateErrorResponse(e);
+        }
+    }
+
+    //	@GetMapping("/bulk-verify")
+//	public ResponseEntity<String> validateEmail2() {
+//		return new ResponseEntity<>("Something2", HttpStatus.OK);
+//	}
+//
+    @ApiOperation(value = "Validate domain name")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success", response = Response.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    @GetMapping(value = "/verify", params = "domain")
+    public ResponseEntity<Response> verifyDomain(@RequestParam String domain) {
+        try {
+            return new ResponseEntity<>(validationService.verifyDomainAndPopulateResponse(domain), HttpStatus.OK);
+        } catch (Exception e) {
+            return populateErrorResponse(e);
+        }
+
+    }
+
+    @ApiOperation(value = "Validate email addresses or domains in bulk")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Success", response = Response.class),
+            @ApiResponse(code = 401, message = "Unauthorized"),
+            @ApiResponse(code = 403, message = "Forbidden"),
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    @PostMapping(value = "/verify", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Response>> bulkVerifyDomains(@RequestBody BulkRequest request) {
+        List<Response> responses = new ArrayList<>();
+        for (String entity : request.getEntities()) {
+            try {
+                if (request.getType().equals("email")) {
+                    responses.add(validationService.verifyAndPopulateResponse(entity));
+                } else if (request.getType().equals("domain")) {
+                    responses.add(validationService.verifyDomainAndPopulateResponse(entity));
+                }
+            } catch (Exception e) {
+                responses.add(populateErrorResponse(e).getBody());
+            }
+        }
+        return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+//    @ApiOperation(value = "Validate email addresses in bulk")
+//    @ApiResponses(value = {
+//            @ApiResponse(code = 200, message = "Success", response = Response.class),
+//            @ApiResponse(code = 401, message = "Unauthorized"),
+//            @ApiResponse(code = 403, message = "Forbidden"),
+//            @ApiResponse(code = 404, message = "Not Found"),
+//            @ApiResponse(code = 500, message = "Internal Server Error")
+//    })
+//    @PostMapping(value = "/verify", params = {"email"})
+//    public ResponseEntity<List<Response>> bulkVerifyEmails(@RequestBody List<String> emails) {
+//        List<Response> responses = new ArrayList<>();
+//        for(String domain: domains)
+//        {
+//            try {
+//                responses.add(validationService.verifyDomainAndPopulateResponse(domain));
+//            } catch (Exception e) {
+//                responses.add(populateErrorResponse(e).getBody());
+//            }
+//        }
+//        return new ResponseEntity<>(responses, HttpStatus.OK);
+//    }
+
+
+    private ResponseEntity<Response> populateErrorResponse(Exception e) {
+        Response response = new Response();
+        List<String> errors = new ArrayList<>();
+        errors.add(e.getMessage());
+        response.setError(errors);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
