@@ -3,10 +3,7 @@ package dev.niveth.verifica.controller;
 import com.hazelcast.org.json.HTTP;
 import dev.niveth.verifica.model.BulkRequest;
 import dev.niveth.verifica.model.Response;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import dev.niveth.verifica.service.ValidationService;
+import springfox.documentation.service.ParameterType;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,8 @@ public class VerificaController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    @GetMapping(value = "/verify", params = "email")
+    @ApiImplicitParam(name = "email", paramType = "query")
+    @GetMapping(value = "/verify/email", params = "email")
     public ResponseEntity<Response> verifyEmail(@RequestParam String email) {
         try {
             return new ResponseEntity<>(validationService.verifyAndPopulateResponse(email), HttpStatus.OK);
@@ -60,7 +60,8 @@ public class VerificaController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    @GetMapping(value = "/verify", params = "domain")
+    @ApiImplicitParam(name = "domain", paramType = "query")
+    @GetMapping(value = "/verify/domain", params = "domain")
     public ResponseEntity<Response> verifyDomain(@RequestParam String domain) {
         try {
             return new ResponseEntity<>(validationService.verifyDomainAndPopulateResponse(domain), HttpStatus.OK);
@@ -78,7 +79,7 @@ public class VerificaController {
             @ApiResponse(code = 404, message = "Not Found"),
             @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    @PostMapping(value = "/verify", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/verify/bulk", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Response>> bulkVerifyDomains(@RequestBody BulkRequest request) {
         List<Response> responses = new ArrayList<>();
         for (String entity : request.getEntities()) {

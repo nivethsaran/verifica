@@ -27,8 +27,7 @@ public class SwaggerConfig {
                     .build()
                     .tags(new Tag(Constants.APP_NAME,"Email Verification"))
                     .apiInfo(getApiInfo())
-                    .groupName(Constants.APP_NAME)
-                    .enableUrlTemplating(true);
+                    .groupName(Constants.APP_NAME);
         }
 
     private ApiInfo getApiInfo() {
