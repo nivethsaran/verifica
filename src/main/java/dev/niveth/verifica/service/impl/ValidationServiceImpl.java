@@ -8,6 +8,7 @@ import dev.niveth.verifica.util.RestClientUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,7 +31,8 @@ public class ValidationServiceImpl implements ValidationService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ValidationServiceImpl.class);
 
-    private final RestClientUtil restClientUtil = new RestClientUtil();
+    @Autowired
+    private RestClientUtil restClientUtil;
 
     @Value("${verifica.deta.url}")
     private String detaUrl;
@@ -104,7 +106,7 @@ public class ValidationServiceImpl implements ValidationService {
      * @param email Input by the user
      * @throws AddressException In the scenario of an invalid email, an Address Exception is thrown
      */
-    public void validateEmailAddress(String email) throws AddressException {
+    private void validateEmailAddress(String email) throws AddressException {
         InternetAddress internetAddress = new InternetAddress(email);
         internetAddress.validate();
     }
@@ -116,7 +118,7 @@ public class ValidationServiceImpl implements ValidationService {
      * @throws AddressException In the scenario of an invalid email, an Address Exception is thrown
      */
     @SuppressWarnings("UnstableApiUsage")
-    public void validateDomainName(String domain) throws AddressException {
+    private void validateDomainName(String domain) throws AddressException {
         if(!InternetDomainName.isValid(domain) || !domain.contains("."))
         {
             throw new AddressException("Invalid Domain Name");
