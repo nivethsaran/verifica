@@ -1,8 +1,8 @@
 package dev.niveth.verifica.controller;
 
-import com.hazelcast.org.json.HTTP;
 import dev.niveth.verifica.model.BulkRequest;
 import dev.niveth.verifica.model.Response;
+import dev.niveth.verifica.service.ValidationService;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import dev.niveth.verifica.service.ValidationService;
-import springfox.documentation.service.ParameterType;
-
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,12 +42,7 @@ public class VerificaController {
             return populateErrorResponse(e);
         }
     }
-
-    //	@GetMapping("/bulk-verify")
-//	public ResponseEntity<String> validateEmail2() {
-//		return new ResponseEntity<>("Something2", HttpStatus.OK);
-//	}
-//
+    
     @ApiOperation(value = "Validate domain name")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = Response.class),
@@ -73,7 +64,7 @@ public class VerificaController {
 
     @ApiOperation(value = "Validate email addresses or domains in bulk")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success", response = Response.class),
+            @ApiResponse(code = 200, message = "Success", response = Response.class, responseContainer = "List"),
             @ApiResponse(code = 401, message = "Unauthorized"),
             @ApiResponse(code = 403, message = "Forbidden"),
             @ApiResponse(code = 404, message = "Not Found"),
@@ -95,28 +86,6 @@ public class VerificaController {
         }
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
-
-//    @ApiOperation(value = "Validate email addresses in bulk")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Success", response = Response.class),
-//            @ApiResponse(code = 401, message = "Unauthorized"),
-//            @ApiResponse(code = 403, message = "Forbidden"),
-//            @ApiResponse(code = 404, message = "Not Found"),
-//            @ApiResponse(code = 500, message = "Internal Server Error")
-//    })
-//    @PostMapping(value = "/verify", params = {"email"})
-//    public ResponseEntity<List<Response>> bulkVerifyEmails(@RequestBody List<String> emails) {
-//        List<Response> responses = new ArrayList<>();
-//        for(String domain: domains)
-//        {
-//            try {
-//                responses.add(validationService.verifyDomainAndPopulateResponse(domain));
-//            } catch (Exception e) {
-//                responses.add(populateErrorResponse(e).getBody());
-//            }
-//        }
-//        return new ResponseEntity<>(responses, HttpStatus.OK);
-//    }
 
 
     private ResponseEntity<Response> populateErrorResponse(Exception e) {
