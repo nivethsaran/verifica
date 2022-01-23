@@ -25,7 +25,7 @@ public class VerificaController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(VerificaController.class);
 
-    @ApiOperation(value = "Validate email address")
+    @ApiOperation(value = "Validate an email address", nickname = "Email Verification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = Response.class),
             @ApiResponse(code = 401, message = "Unauthorized"),
@@ -42,8 +42,8 @@ public class VerificaController {
             return populateErrorResponse(e);
         }
     }
-    
-    @ApiOperation(value = "Validate domain name")
+
+    @ApiOperation(value = "Validate a domain name", nickname = "Domain Verification")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = Response.class),
             @ApiResponse(code = 401, message = "Unauthorized"),
@@ -62,7 +62,7 @@ public class VerificaController {
 
     }
 
-    @ApiOperation(value = "Validate email addresses or domains in bulk")
+    @ApiOperation(value = "If you have to verify multiple emails or domains, this API would be much more efficient", nickname = "Verify emails or domains in bulk")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success", response = Response.class, responseContainer = "List"),
             @ApiResponse(code = 401, message = "Unauthorized"),
