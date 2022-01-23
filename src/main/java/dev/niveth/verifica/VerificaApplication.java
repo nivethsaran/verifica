@@ -10,7 +10,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 
 @SpringBootApplication
-@PropertySource("application-${spring.profiles.active}.properties")
+@PropertySource("classpath:application-${spring.profiles.active}.properties")
 public class VerificaApplication {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(VerificaApplication.class);
