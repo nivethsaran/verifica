@@ -20,6 +20,7 @@ public class VerificaApplication {
     public static final Logger LOGGER = LoggerFactory.getLogger(VerificaApplication.class);
 
     public static void main(String[] args) {
+        //Test Deploy
         SpringApplication application = new SpringApplication(VerificaApplication.class);
         ConfigurableEnvironment environment = new StandardEnvironment();
         String env = System.getProperty("spring.profiles.active","local");
